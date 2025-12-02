@@ -1,0 +1,52 @@
+{
+  "Customer": {
+    "Taxable": true,
+    "BillAddr": {
+      "Id": "97",
+      "Line1": "123 Main Street",
+      "City": "Mountain View",
+      "Country": "USA",
+      "CountrySubDivisionCode": "CA",
+      "PostalCode": "94042"
+    },
+    "Notes": "Here are other details.",
+    "Job": false,
+    "BillWithParent": false,
+    "Balance": 0,
+    "BalanceWithJobs": 0,
+    "CurrencyRef": {
+      "value": "USD",
+      "name": "United States Dollar"
+    },
+    "PreferredDeliveryMethod": "Print",
+    "IsProject": false,
+    "domain": "QBO",
+    "sparse": false,
+    "Id": "59",
+    "SyncToken": "0",
+    "MetaData": {
+      "CreateTime": "2025-12-01T08:37:29-08:00",
+      "LastUpdatedTime": "2025-12-01T08:37:29-08:00"
+    },
+    "Title": "Mr",
+    "GivenName": "James",
+    "MiddleName": "B",
+    "FamilyName": "King",
+    "Suffix": "Jr",
+    "FullyQualifiedName": "CG Group",
+    "CompanyName": "CG Group",
+    "DisplayName": "CG Group",
+    "PrintOnCheckName": "CG Group",
+    "Active": true,
+    "PrimaryPhone": {
+      "FreeFormNumber": "(555) 555-5555"
+    },
+    "PrimaryEmailAddr": {
+      "Address": "cgroup@myemail.com"
+    },
+    "DefaultTaxCodeRef": {
+      "value": "2"
+    }
+  },
+  "time": "2025-12-02T02:15:56.110-08:00"
+}
