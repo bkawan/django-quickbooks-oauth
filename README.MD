@@ -1,0 +1,693 @@
+---
+
+# Django QuickBooks OAuth Integration
+
+This Django project demonstrates **QuickBooks Online (QBO) OAuth 2.0 integration**, fetching company and customer data using **session-stored tokens**.
+It supports **sandbox and production environments** and automatically refreshes expired access tokens.
+
+---
+
+## Features
+
+* Connect your QuickBooks account via OAuth 2.0
+* Fetch customers and company info
+* Session-based token storage (no database required)
+* Automatic token refresh
+* Sandbox and Production environment support
+
+---
+
+## Endpoints
+
+| Path                   | Description                                                        |
+| ---------------------- | ------------------------------------------------------------------ |
+| `/connect/`            | Redirects user to QuickBooks OAuth authorization page              |
+| `/callback/`           | Handles OAuth callback and stores access/refresh tokens in session |
+| `/customers/`          | Fetches all customers (first 10 by default)                        |
+| `/customers/<int:id>/` | Fetch a single customer by ID                                      |
+| `/company/`            | Fetch company info for the connected QuickBooks account            |
+
+
+## Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/bkawan/django-quickbooks-oauth.git
+cd django-quickbooks-oauth
+```
+
+2. Create a virtual environment and activate it:
+
+```bash
+python -m venv venv
+source venv/bin/activate   # Linux/macOS
+venv\Scripts\activate      # Windows
+```
+
+3. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Create a `.env` file with your QuickBooks credentials:
+
+```env
+QBO_CLIENT_ID=your_client_id
+QBO_CLIENT_SECRET=your_client_secret
+QBO_REDIRECT_URI=http://localhost:8000/callback/
+QBO_ENVIRONMENT=sandbox
+QBO_SANDBOX_BASE_URL=https://sandbox-quickbooks.api.intuit.com
+QBO_PRODUCTION_BASE_URL=https://quickbooks.api.intuit.com
+```
+
+---
+
+## Running the Project
+
+1. Run migrations (if needed):
+
+```bash
+python manage.py migrate
+```
+
+2. Start the Django development server:
+
+```bash
+python manage.py runserver
+```
+
+3. Open your browser and visit:
+
+```
+http://localhost:8000/connect/
+```
+
+* This will redirect to QuickBooks OAuth authorization.
+* After authorization, QuickBooks will redirect to `/callback/`.
+* Then you can access `/customers/` or `/company/` to fetch data.
+
+---
+
+## Notes
+
+* This project stores tokens in **Django sessions**, so they are **temporary** and lost when the session expires.
+* For production, you may want to **store tokens in your database** per user.
+* Tokens must match the **sandbox or production environment**. Sandbox tokens will not work in production URL.
+
+---
+
+Example JSON Responses
+
+Customer List
+
+`/customers/`
+
+```json
+{
+  "QueryResponse": {
+    "Customer": [
+      {
+        "Taxable": true,
+        "BillAddr": {
+          "Id": "2",
+          "Line1": "4581 Finch St.",
+          "City": "Bayshore",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94326",
+          "Lat": "INVALID",
+          "Long": "INVALID"
+        },
+        "ShipAddr": {
+          "Id": "2",
+          "Line1": "4581 Finch St.",
+          "City": "Bayshore",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94326",
+          "Lat": "INVALID",
+          "Long": "INVALID"
+        },
+        "Job": false,
+        "BillWithParent": false,
+        "Balance": 239,
+        "BalanceWithJobs": 239,
+        "CurrencyRef": {
+          "value": "USD",
+          "name": "United States Dollar"
+        },
+        "PreferredDeliveryMethod": "Print",
+        "IsProject": false,
+        "ClientEntityId": "0",
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "1",
+        "SyncToken": "0",
+        "MetaData": {
+          "CreateTime": "2025-10-28T16:48:43-07:00",
+          "LastUpdatedTime": "2025-11-04T13:39:32-08:00"
+        },
+        "GivenName": "Amy",
+        "FamilyName": "Lauterbach",
+        "FullyQualifiedName": "Amy's Bird Sanctuary",
+        "CompanyName": "Amy's Bird Sanctuary",
+        "DisplayName": "Amy's Bird Sanctuary",
+        "PrintOnCheckName": "Amy's Bird Sanctuary",
+        "Active": true,
+        "V4IDPseudonym": "00209823765016eda04327afc2199fe16d8c36",
+        "PrimaryPhone": {
+          "FreeFormNumber": "(650) 555-3311"
+        },
+        "PrimaryEmailAddr": {
+          "Address": "Birds@Intuit.com"
+        }
+      },
+      {
+        "Taxable": false,
+        "BillAddr": {
+          "Id": "3",
+          "Line1": "12 Ocean Dr.",
+          "City": "Half Moon Bay",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94213",
+          "Lat": "37.4307072",
+          "Long": "-122.4295234"
+        },
+        "Job": false,
+        "BillWithParent": false,
+        "Balance": 85,
+        "BalanceWithJobs": 85,
+        "CurrencyRef": {
+          "value": "USD",
+          "name": "United States Dollar"
+        },
+        "PreferredDeliveryMethod": "Print",
+        "IsProject": false,
+        "ClientEntityId": "0",
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "2",
+        "SyncToken": "0",
+        "MetaData": {
+          "CreateTime": "2025-10-28T16:49:28-07:00",
+          "LastUpdatedTime": "2025-11-04T12:56:01-08:00"
+        },
+        "GivenName": "Bill",
+        "FamilyName": "Lucchini",
+        "FullyQualifiedName": "Bill's Windsurf Shop",
+        "CompanyName": "Bill's Windsurf Shop",
+        "DisplayName": "Bill's Windsurf Shop",
+        "PrintOnCheckName": "Bill's Windsurf Shop",
+        "Active": true,
+        "V4IDPseudonym": "002098b24491061d874441806bd2a878b50571",
+        "PrimaryPhone": {
+          "FreeFormNumber": "(415) 444-6538"
+        },
+        "PrimaryEmailAddr": {
+          "Address": "Surf@Intuit.com"
+        }
+      },
+      {
+        "Taxable": true,
+        "BillAddr": {
+          "Id": "97",
+          "Line1": "123 Main Street",
+          "City": "Mountain View",
+          "Country": "USA",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94042"
+        },
+        "Notes": "Here are other details.",
+        "Job": false,
+        "BillWithParent": false,
+        "Balance": 0,
+        "BalanceWithJobs": 0,
+        "CurrencyRef": {
+          "value": "USD",
+          "name": "United States Dollar"
+        },
+        "PreferredDeliveryMethod": "Print",
+        "IsProject": false,
+        "ClientEntityId": "0",
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "59",
+        "SyncToken": "0",
+        "MetaData": {
+          "CreateTime": "2025-12-01T08:37:29-08:00",
+          "LastUpdatedTime": "2025-12-01T08:37:29-08:00"
+        },
+        "Title": "Mr",
+        "GivenName": "James",
+        "MiddleName": "B",
+        "FamilyName": "King",
+        "Suffix": "Jr",
+        "FullyQualifiedName": "CG Group",
+        "CompanyName": "CG Group",
+        "DisplayName": "CG Group",
+        "PrintOnCheckName": "CG Group",
+        "Active": true,
+        "V4IDPseudonym": "0020984ace8e01ae2a4789b55aba9cc124519b",
+        "PrimaryPhone": {
+          "FreeFormNumber": "(555) 555-5555"
+        },
+        "PrimaryEmailAddr": {
+          "Address": "cgroup@myemail.com"
+        }
+      },
+      {
+        "Taxable": false,
+        "BillAddr": {
+          "Id": "4",
+          "Line1": "65 Ocean Dr.",
+          "City": "Half Moon Bay",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94213",
+          "Lat": "37.4300318",
+          "Long": "-122.4336537"
+        },
+        "Job": false,
+        "BillWithParent": false,
+        "Balance": 0,
+        "BalanceWithJobs": 0,
+        "CurrencyRef": {
+          "value": "USD",
+          "name": "United States Dollar"
+        },
+        "PreferredDeliveryMethod": "Print",
+        "IsProject": false,
+        "ClientEntityId": "0",
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "3",
+        "SyncToken": "0",
+        "MetaData": {
+          "CreateTime": "2025-10-28T16:51:22-07:00",
+          "LastUpdatedTime": "2025-11-05T12:59:21-08:00"
+        },
+        "GivenName": "Grace",
+        "FamilyName": "Pariente",
+        "FullyQualifiedName": "Cool Cars",
+        "CompanyName": "Cool Cars",
+        "DisplayName": "Cool Cars",
+        "PrintOnCheckName": "Cool Cars",
+        "Active": true,
+        "V4IDPseudonym": "002098b0776202c8b442f5856259d1e5f23ad9",
+        "PrimaryPhone": {
+          "FreeFormNumber": "(415) 555-9933"
+        },
+        "PrimaryEmailAddr": {
+          "Address": "Cool_Cars@intuit.com"
+        }
+      },
+      {
+        "Taxable": false,
+        "BillAddr": {
+          "Id": "5",
+          "Line1": "321 Channing",
+          "City": "Palo Alto",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94303",
+          "Lat": "37.443231",
+          "Long": "-122.1561846"
+        },
+        "Job": false,
+        "BillWithParent": false,
+        "Balance": 0,
+        "BalanceWithJobs": 0,
+        "CurrencyRef": {
+          "value": "USD",
+          "name": "United States Dollar"
+        },
+        "PreferredDeliveryMethod": "Print",
+        "IsProject": false,
+        "ClientEntityId": "0",
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "4",
+        "SyncToken": "0",
+        "MetaData": {
+          "CreateTime": "2025-10-28T16:52:08-07:00",
+          "LastUpdatedTime": "2025-10-28T16:52:08-07:00"
+        },
+        "GivenName": "Diego",
+        "FamilyName": "Rodriguez",
+        "FullyQualifiedName": "Diego Rodriguez",
+        "DisplayName": "Diego Rodriguez",
+        "PrintOnCheckName": "Diego Rodriguez",
+        "Active": true,
+        "V4IDPseudonym": "0020982a481521f7e3433b8ab896a51a706966",
+        "PrimaryPhone": {
+          "FreeFormNumber": "(650) 555-4477"
+        },
+        "PrimaryEmailAddr": {
+          "Address": "Diego@Rodriguez.com"
+        }
+      },
+      {
+        "Taxable": true,
+        "BillAddr": {
+          "Id": "6",
+          "Line1": "25 Court St.",
+          "City": "Tucson",
+          "CountrySubDivisionCode": "AZ",
+          "PostalCode": "85719",
+          "Lat": "32.2841116",
+          "Long": "-110.9744298"
+        },
+        "ShipAddr": {
+          "Id": "6",
+          "Line1": "25 Court St.",
+          "City": "Tucson",
+          "CountrySubDivisionCode": "AZ",
+          "PostalCode": "85719",
+          "Lat": "32.2841116",
+          "Long": "-110.9744298"
+        },
+        "Job": false,
+        "BillWithParent": false,
+        "Balance": 0,
+        "BalanceWithJobs": 0,
+        "CurrencyRef": {
+          "value": "USD",
+          "name": "United States Dollar"
+        },
+        "PreferredDeliveryMethod": "Print",
+        "IsProject": false,
+        "ClientEntityId": "0",
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "5",
+        "SyncToken": "1",
+        "MetaData": {
+          "CreateTime": "2025-10-28T16:54:59-07:00",
+          "LastUpdatedTime": "2025-11-04T13:28:29-08:00"
+        },
+        "GivenName": "Peter",
+        "FamilyName": "Dukes",
+        "FullyQualifiedName": "Dukes Basketball Camp",
+        "CompanyName": "Dukes Basketball Camp",
+        "DisplayName": "Dukes Basketball Camp",
+        "PrintOnCheckName": "Dukes Basketball Camp",
+        "Active": true,
+        "V4IDPseudonym": "002098a2707a759fd94f108d4f2033dabb9b33",
+        "PrimaryPhone": {
+          "FreeFormNumber": "(520) 420-5638"
+        },
+        "PrimaryEmailAddr": {
+          "Address": "Dukes_bball@intuit.com"
+        }
+      },
+      {
+        "Taxable": false,
+        "Job": false,
+        "BillWithParent": false,
+        "Balance": 0,
+        "BalanceWithJobs": 0,
+        "CurrencyRef": {
+          "value": "USD",
+          "name": "United States Dollar"
+        },
+        "PreferredDeliveryMethod": "Print",
+        "IsProject": false,
+        "ClientEntityId": "0",
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "6",
+        "SyncToken": "0",
+        "MetaData": {
+          "CreateTime": "2025-10-28T16:55:21-07:00",
+          "LastUpdatedTime": "2025-10-28T16:55:21-07:00"
+        },
+        "GivenName": "Dylan",
+        "FamilyName": "Sollfrank",
+        "FullyQualifiedName": "Dylan Sollfrank",
+        "DisplayName": "Dylan Sollfrank",
+        "PrintOnCheckName": "Dylan Sollfrank",
+        "Active": true,
+        "V4IDPseudonym": "002098b47c8dce8d3c41198438805a0e0db4f1"
+      },
+      {
+        "Taxable": false,
+        "BillAddr": {
+          "Id": "7",
+          "Line1": "370 Easy St.",
+          "City": "Middlefield",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94482",
+          "Lat": "37.4031672",
+          "Long": "-122.0642815"
+        },
+        "ShipAddr": {
+          "Id": "7",
+          "Line1": "370 Easy St.",
+          "City": "Middlefield",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94482",
+          "Lat": "37.4031672",
+          "Long": "-122.0642815"
+        },
+        "Job": false,
+        "BillWithParent": false,
+        "Balance": 0,
+        "BalanceWithJobs": 562.5,
+        "CurrencyRef": {
+          "value": "USD",
+          "name": "United States Dollar"
+        },
+        "PreferredDeliveryMethod": "Print",
+        "IsProject": false,
+        "ClientEntityId": "0",
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "7",
+        "SyncToken": "0",
+        "MetaData": {
+          "CreateTime": "2025-10-28T16:57:10-07:00",
+          "LastUpdatedTime": "2025-11-05T13:15:36-08:00"
+        },
+        "GivenName": "Kirby",
+        "FamilyName": "Freeman",
+        "FullyQualifiedName": "Freeman Sporting Goods",
+        "CompanyName": "Freeman Sporting Goods",
+        "DisplayName": "Freeman Sporting Goods",
+        "PrintOnCheckName": "Freeman Sporting Goods",
+        "Active": true,
+        "V4IDPseudonym": "00209812df089675154cfc834808347e721e2a",
+        "PrimaryPhone": {
+          "FreeFormNumber": "(650) 555-0987"
+        },
+        "Mobile": {
+          "FreeFormNumber": "(973) 555-8849"
+        },
+        "Fax": {
+          "FreeFormNumber": "(520) 555-7894"
+        },
+        "PrimaryEmailAddr": {
+          "Address": "Sporting_goods@intuit.com"
+        },
+        "WebAddr": {
+          "URI": "http://sportinggoods.intuit.com"
+        }
+      },
+      {
+        "Taxable": false,
+        "BillAddr": {
+          "Id": "8",
+          "Line1": "370 Easy St.",
+          "City": "Middlefield",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94482",
+          "Lat": "37.4031672",
+          "Long": "-122.0642815"
+        },
+        "ShipAddr": {
+          "Id": "8",
+          "Line1": "370 Easy St.",
+          "City": "Middlefield",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94482",
+          "Lat": "37.4031672",
+          "Long": "-122.0642815"
+        },
+        "Job": true,
+        "BillWithParent": false,
+        "ParentRef": {
+          "value": "7"
+        },
+        "Level": 1,
+        "Balance": 477.5,
+        "BalanceWithJobs": 477.5,
+        "CurrencyRef": {
+          "value": "USD",
+          "name": "United States Dollar"
+        },
+        "PreferredDeliveryMethod": "Print",
+        "IsProject": false,
+        "ClientEntityId": "0",
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "8",
+        "SyncToken": "0",
+        "MetaData": {
+          "CreateTime": "2025-10-28T17:00:01-07:00",
+          "LastUpdatedTime": "2025-11-05T13:15:36-08:00"
+        },
+        "GivenName": "Sasha",
+        "FamilyName": "Tillou",
+        "FullyQualifiedName": "Freeman Sporting Goods:0969 Ocean View Road",
+        "CompanyName": "Freeman Sporting Goods",
+        "DisplayName": "0969 Ocean View Road",
+        "PrintOnCheckName": "Freeman Sporting Goods",
+        "Active": true,
+        "V4IDPseudonym": "0020984f678537fe8548cb8bc318ccbc327721",
+        "PrimaryPhone": {
+          "FreeFormNumber": "(415) 555-9933"
+        },
+        "Mobile": {
+          "FreeFormNumber": "(973) 555-8849"
+        },
+        "Fax": {
+          "FreeFormNumber": "(520) 555-7894"
+        },
+        "PrimaryEmailAddr": {
+          "Address": "Sporting_goods@intuit.com"
+        },
+        "WebAddr": {
+          "URI": "http://sportinggoods.intuit.com"
+        }
+      },
+      {
+        "Taxable": false,
+        "BillAddr": {
+          "Id": "9",
+          "Line1": "370 Easy St.",
+          "City": "Middlefield",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94482",
+          "Lat": "37.4031672",
+          "Long": "-122.0642815"
+        },
+        "ShipAddr": {
+          "Id": "9",
+          "Line1": "370 Easy St.",
+          "City": "Middlefield",
+          "CountrySubDivisionCode": "CA",
+          "PostalCode": "94482",
+          "Lat": "37.4031672",
+          "Long": "-122.0642815"
+        },
+        "Job": true,
+        "BillWithParent": false,
+        "ParentRef": {
+          "value": "7"
+        },
+        "Level": 1,
+        "Balance": 85,
+        "BalanceWithJobs": 85,
+        "CurrencyRef": {
+          "value": "USD",
+          "name": "United States Dollar"
+        },
+        "PreferredDeliveryMethod": "Print",
+        "IsProject": false,
+        "ClientEntityId": "0",
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "9",
+        "SyncToken": "0",
+        "MetaData": {
+          "CreateTime": "2025-10-28T17:01:00-07:00",
+          "LastUpdatedTime": "2025-11-04T13:23:52-08:00"
+        },
+        "GivenName": "Amelia",
+        "FullyQualifiedName": "Freeman Sporting Goods:55 Twin Lane",
+        "CompanyName": "Freeman Sporting Goods",
+        "DisplayName": "55 Twin Lane",
+        "PrintOnCheckName": "Freeman Sporting Goods",
+        "Active": true,
+        "V4IDPseudonym": "0020985559bc7d0c414357b13ec57090906330",
+        "PrimaryPhone": {
+          "FreeFormNumber": "(650) 555-0987"
+        },
+        "Mobile": {
+          "FreeFormNumber": "(973) 555-8849"
+        },
+        "Fax": {
+          "FreeFormNumber": "(520) 555-7894"
+        },
+        "PrimaryEmailAddr": {
+          "Address": "Sporting_goods@intuit.com"
+        },
+        "WebAddr": {
+          "URI": "http://sportinggoods.intuit.com"
+        }
+      }
+    ],
+    "startPosition": 1,
+    "maxResults": 10
+  },
+  "time": "2025-12-02T02:12:20.793-08:00"
+}
+```
+
+
+
+Customer Detail
+
+`/customers/<int:id>/`
+```json
+{
+  "Customer": {
+    "Taxable": true,
+    "BillAddr": {
+      "Id": "97",
+      "Line1": "123 Main Street",
+      "City": "Mountain View",
+      "Country": "USA",
+      "CountrySubDivisionCode": "CA",
+      "PostalCode": "94042"
+    },
+    "Notes": "Here are other details.",
+    "Job": false,
+    "BillWithParent": false,
+    "Balance": 0,
+    "BalanceWithJobs": 0,
+    "CurrencyRef": {
+      "value": "USD",
+      "name": "United States Dollar"
+    },
+    "PreferredDeliveryMethod": "Print",
+    "IsProject": false,
+    "domain": "QBO",
+    "sparse": false,
+    "Id": "59",
+    "SyncToken": "0",
+    "MetaData": {
+      "CreateTime": "2025-12-01T08:37:29-08:00",
+      "LastUpdatedTime": "2025-12-01T08:37:29-08:00"
+    },
+    "Title": "Mr",
+    "GivenName": "James",
+    "MiddleName": "B",
+    "FamilyName": "King",
+    "Suffix": "Jr",
+    "FullyQualifiedName": "CG Group",
+    "CompanyName": "CG Group",
+    "DisplayName": "CG Group",
+    "PrintOnCheckName": "CG Group",
+    "Active": true,
+    "PrimaryPhone": {
+      "FreeFormNumber": "(555) 555-5555"
+    },
+    "PrimaryEmailAddr": {
+      "Address": "cgroup@myemail.com"
+    },
+    "DefaultTaxCodeRef": {
+      "value": "2"
+    }
+  },
+  "time": "2025-12-02T02:15:56.110-08:00"
+}
+```
+
