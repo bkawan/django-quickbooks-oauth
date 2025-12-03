@@ -113,7 +113,7 @@ def get_customers(request):
 
     base_url = settings.QBO_BASE_URL
     url = f"{base_url}/v3/company/{realm_id}/query"
-    query = "SELECT * FROM Customer MAXRESULTS 10"
+    query = "SELECT * FROM Customer MAXRESULTS 31"
 
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -182,6 +182,135 @@ def get_customer(request, id):
 
     try:
         response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+    except requests.exceptions.HTTPError as e:
+        if response.status_code == 401:
+            data = {"error": "Unauthorized: Access token may have expired"}
+        else:
+            data = {"error": "QuickBooks API HTTP error", "details": str(e)}
+    except requests.exceptions.RequestException as e:
+        data = {"error": "QuickBooks API request failed", "details": str(e)}
+
+    return JsonResponse(data)
+
+
+def get_invoices(request):
+    """
+    Fetch QuickBooks customers using session-stored tokens.
+    """
+    access_token = refresh_qb_token(request)
+    realm_id = request.session.get('qb_realm_id')
+
+    if not access_token or not realm_id:
+        return JsonResponse({"error": "QuickBooks not connected or token expired"}, status=400)
+
+    base_url = settings.QBO_BASE_URL
+    url = f"{base_url}/v3/company/{realm_id}/query"
+    params = {
+        "query": "SELECT * FROM Invoice  MAXRESULTS 5",
+        "minorversion": "75"  #
+    }
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "application/json"
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params=params, timeout=10)
+        print(response.url)
+        response.raise_for_status()
+        data = response.json()
+    except requests.exceptions.HTTPError as e:
+        if response.status_code == 401:
+            data = {"error": "Unauthorized: Access token may have expired"}
+        else:
+            data = {"error": "QuickBooks API HTTP error", "details": str(e)}
+    except requests.exceptions.RequestException as e:
+        data = {"error": "QuickBooks API request failed", "details": str(e)}
+
+    return JsonResponse(data)
+
+
+def get_invoice_pdf(request, invoice_id):
+    """
+    Fetch a QuickBooks Invoice PDF and return it as a file download.
+    """
+
+    access_token = refresh_qb_token(request)
+    realm_id = request.session.get("qb_realm_id")
+
+    if not access_token or not realm_id:
+        return JsonResponse({"error": "QuickBooks not connected or token expired"}, status=400)
+
+    base_url = settings.QBO_BASE_URL  # Example: https://quickbooks.api.intuit.com
+    url = f"{base_url}/v3/company/{realm_id}/invoice/{invoice_id}/pdf"
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "application/pdf"
+    }
+
+    params = {"minorversion": "75"}
+
+    try:
+        response = requests.get(url, headers=headers, params=params, timeout=20)
+        print("QBO URL:", response.url)
+        response.raise_for_status()
+
+        # SUCCESS → Return PDF file
+        return HttpResponse(
+            response.content,
+            content_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="invoice_{invoice_id}.pdf"'
+            }
+        )
+
+    except requests.exceptions.HTTPError as e:
+        # Unauthorized (token expired)
+        if response.status_code == 401:
+            return JsonResponse({
+                "error": "Unauthorized: Access token may have expired"
+            }, status=401)
+
+        return JsonResponse({
+            "error": "QuickBooks API HTTP error",
+            "status": response.status_code,
+            "details": str(e)
+        }, status=response.status_code)
+
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({
+            "error": "QuickBooks API request failed",
+            "details": str(e)
+        }, status=500)
+
+
+def get_invoice(request, invoice_id):
+    """
+    Fetch QuickBooks customers using session-stored tokens.
+    """
+    access_token = refresh_qb_token(request)
+    realm_id = request.session.get('qb_realm_id')
+
+    if not access_token or not realm_id:
+        return JsonResponse({"error": "QuickBooks not connected or token expired"}, status=400)
+
+    base_url = settings.QBO_BASE_URL
+    url = f"{base_url}/v3/company/{realm_id}/query"
+    params = {
+        "query": f"select * from Invoice where id = '{invoice_id}'",
+        "minorversion": "75"  #
+    }
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "application/json"
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params=params, timeout=10)
+        print(response.url)
         response.raise_for_status()
         data = response.json()
     except requests.exceptions.HTTPError as e:

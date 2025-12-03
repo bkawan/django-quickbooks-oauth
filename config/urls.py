@@ -26,4 +26,8 @@ urlpatterns = [
     path('customers/', views.get_customers, name='customers'),
     path('customers/<int:id>/', views.get_customer, name='customer'),
     path('company/', views.get_company_info, name='company'),
+    path('invoices/', views.get_invoices, name='invoices'),
+    path('invoices/<int:invoice_id>/pdf/', views.get_invoice_pdf, name='invoice_pdf'),
+    path('invoices/<int:invoice_id>/', views.get_invoice, name='get_invoice'),
 ]
+
