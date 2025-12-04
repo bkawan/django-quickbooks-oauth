@@ -5096,3 +5096,138 @@ Customer Detail
   "time": "2025-12-03T03:34:23.072-08:00"
 }
 ```
+
+Here’s a **clean, final documented version** of your API usage, with assumptions, daily/monthly totals, API calls, and cost mapping to tiers. I’ve formatted it for clarity.
+
+---
+
+## **API Usage Document – Package 1 (High Usage Scenario)**
+
+## **Assumptions**
+
+* Maximum results per API call = **1,000**
+* Total clients = **100**
+* Month = **30 days**
+* Silver Tier included API credits = **1,000,000**
+* PDFs require **1 API call per invoice** (cannot batch)
+* Customers and Invoices can be paginated (up to 1,000 per API call)
+
+---
+
+## **Total Records**
+
+| Operation | 1 Client (Daily) | 100 Clients (Daily) | 1 Client (Monthly) | 100 Clients (Monthly) |
+| --------- | ---------------- | ------------------- | ------------------ | --------------------- |
+| Customers | 100              | 10,000              | 3,000              | 300,000               |
+| Invoices  | 500              | 50,000              | 15,000             | 1,500,000             |
+| PDFs      | 500              | 50,000              | 15,000             | 1,500,000             |
+
+> **Notes:** PDFs dominate API usage. Customers and Invoices are efficiently fetched via pagination.
+
+---
+
+## **API Calls Required**
+
+| Operation | Daily API Calls (100 clients) | Monthly API Calls (100 clients) |
+| --------- | ----------------------------- | ------------------------------- |
+| Customers | 100                           | 3,000                           |
+| Invoices  | 100                           | 3,000                           |
+| PDFs      | 50,000                        | 1,500,000                       |
+| **Total** | 50,200                        | 1,506,000                       |
+
+---
+
+## **Tier & Pricing Mapping**
+
+| Tier    | Monthly Program Fee | Included API Credits | Total API Calls | Over Usage | Over Usage Cost   | Total Cost |
+| ------- | ------------------- | -------------------- | --------------- | ---------- | ----------------- | ---------- |
+| Builder | $0                  | 500,000              | 1,506,000       | 1,006,000  | N/A / Not allowed | N/A        |
+| Silver  | $300                | 1,000,000            | 1,506,000       | 506,000    | $1,771            | $2,071     |
+| Gold    | $1,700              | 10,000,000           | 1,506,000       | 0          | $0                | $1,700     |
+
+> **Calculations for Silver Tier:**
+>
+> * Over Usage = 1,506,000 – 1,000,000 = 506,000 calls
+> * Rate = $3.50 per 1,000 calls
+> * Over Usage Cost = 506 × 3.50 = $1,771
+> * Total Cost = $300 (program fee) + $1,771 = $2,071
+
+---
+
+### ✅ **Summary**
+
+* **Package 1** is a **high-usage scenario** (500 invoices/client/day).
+* PDFs dominate API usage.
+* Builder tier **cannot handle this usage**.
+* Silver tier covers it but incurs overage costs.
+* Gold tier fully covers it within included credits.
+
+---
+
+Perfect! Let’s document the **low-usage package** fully, including **assumptions, daily/monthly totals, API calls, and tier/cost mapping** similar to the high-usage package.
+
+---
+
+## **API Usage Document – Package 2 (Low Usage Scenario)**
+
+## **Assumptions**
+
+* Maximum results per API call = **1,000**
+* Total clients = **100**
+* Month = **30 days**
+* Silver Tier included API credits = **1,000,000**
+* PDFs require **1 API call per invoice** (cannot batch)
+* Customers and Invoices can be paginated (up to 1,000 per API call)
+
+---
+
+## **Total Records**
+
+| Operation | 1 Client (Daily) | 100 Clients (Daily) | 1 Client (Monthly) | 100 Clients (Monthly) |
+| --------- | ---------------- | ------------------- | ------------------ | --------------------- |
+| Customers | 50               | 5,000               | 1,500              | 150,000               |
+| Invoices  | 100              | 10,000              | 3,000              | 300,000               |
+| PDFs      | 100              | 10,000              | 3,000              | 300,000               |
+
+> **Notes:** PDFs still require individual API calls. Customers and Invoices are efficiently fetched via pagination.
+
+---
+
+## **API Calls Required**
+
+| Operation | Daily API Calls (100 clients) | Monthly API Calls (100 clients) |
+| --------- | ----------------------------- | ------------------------------- |
+| Customers | 100                           | 3,000                           |
+| Invoices  | 100                           | 3,000                           |
+| PDFs      | 10,000                        | 300,000                         |
+| **Total** | 10,200                        | 306,000                         |
+
+---
+
+## **Tier & Pricing Mapping**
+
+| Tier    | Monthly Program Fee | Included API Credits | Total API Calls | Over Usage | Over Usage Cost | Total Cost |
+| ------- | ------------------- | -------------------- | --------------- | ---------- | --------------- | ---------- |
+| Builder | $0                  | 500,000              | 306,000         | 0          | $0              | $0         |
+| Silver  | $300                | 1,000,000            | 306,000         | 0          | $0              | $300       |
+| Gold    | $1,700              | 10,000,000           | 306,000         | 0          | $0              | $1,700     |
+
+> **Notes:**
+>
+> * Total API calls (306,000/month) are **below Silver tier’s 1,000,000 included credits**.
+> * No overage cost applies.
+> * PDFs dominate usage but still within included credits.
+
+---
+
+### ✅ **Summary**
+
+* **Package 2** is a **low-usage scenario** (100 invoices/client/day).
+* Total API calls are **well within included credits** of Builder/Silver tiers.
+* **No overage cost**, so **Builder tier ($0)** can be used if desired.
+* Silver and Gold tiers are also available but not necessary for this usage.
+
+---
+
+
+
