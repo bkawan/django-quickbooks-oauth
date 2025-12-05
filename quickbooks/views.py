@@ -1,9 +1,10 @@
+import json
 import uuid
 import requests
 from datetime import timedelta
 from django.conf import settings
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils import timezone
 from intuitlib.client import AuthClient
 from intuitlib.enums import Scopes
@@ -59,6 +60,7 @@ def quickbooks_callback(request):
     request.session['qb_realm_id'] = realm_id
     request.session['qb_token_expiry'] = (timezone.now() + timedelta(seconds=auth_client.expires_in)).timestamp()
 
+    return redirect('/')
     return HttpResponse("QuickBooks connected successfully!")
 
 
@@ -113,7 +115,7 @@ def get_customers(request):
 
     base_url = settings.QBO_BASE_URL
     url = f"{base_url}/v3/company/{realm_id}/query"
-    query = "SELECT * FROM Customer MAXRESULTS 31"
+    query = "SELECT * FROM Customer MAXRESULTS 2"
 
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -131,8 +133,20 @@ def get_customers(request):
             data = {"error": "QuickBooks API HTTP error", "details": str(e)}
     except requests.exceptions.RequestException as e:
         data = {"error": "QuickBooks API request failed", "details": str(e)}
+    customers = []
+    try:
+        response = requests.get(url, headers=headers, params={"query": query}, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        customers = data.get("QueryResponse", {}).get("Customer", [])
+    except requests.exceptions.HTTPError as e:
+        error_msg = "Unauthorized: Access token may have expired" if response.status_code == 401 else str(e)
+        return render(request, 'customers.html', {'error': error_msg})
+    except requests.exceptions.RequestException as e:
+        return render(request, 'customers.html', {'error': f"QuickBooks API request failed: {e}"})
 
-    return JsonResponse(data)
+    return render(request, 'customers.html', {'customers': customers})
+    # return JsonResponse(data)
 
 
 def get_company_info(request):
@@ -160,7 +174,10 @@ def get_company_info(request):
     except requests.exceptions.RequestException as e:
         data = {"error": "QuickBooks API request failed", "details": str(e)}
 
-    return JsonResponse(data)
+        # Convert dict to pretty-printed JSON string
+    pretty_json = json.dumps(data, indent=4)
+    return render(request, 'company.html', {'json_data': pretty_json})
+    # return JsonResponse(data)
 
 
 def get_customer(request, id):
@@ -191,6 +208,8 @@ def get_customer(request, id):
             data = {"error": "QuickBooks API HTTP error", "details": str(e)}
     except requests.exceptions.RequestException as e:
         data = {"error": "QuickBooks API request failed", "details": str(e)}
+    pretty_json = json.dumps(data, indent=4)
+    return render(request, 'customer.html', {'json_data': pretty_json})
 
     return JsonResponse(data)
 
@@ -229,6 +248,20 @@ def get_invoices(request):
     except requests.exceptions.RequestException as e:
         data = {"error": "QuickBooks API request failed", "details": str(e)}
 
+    # Extract invoice list safely
+    invoices = data.get("QueryResponse", {}).get("Invoice", [])
+
+    # Prepare pretty JSON
+    pretty_json = json.dumps(data, indent=4)
+
+    return render(
+        request,
+        "invoices.html",
+        {
+            "invoices": invoices,
+            "json_data": pretty_json
+        }
+    )
     return JsonResponse(data)
 
 
@@ -320,5 +353,50 @@ def get_invoice(request, invoice_id):
             data = {"error": "QuickBooks API HTTP error", "details": str(e)}
     except requests.exceptions.RequestException as e:
         data = {"error": "QuickBooks API request failed", "details": str(e)}
+    pretty_json = json.dumps(data, indent=4)
 
+    return render(
+        request,
+        "invoice.html",
+        {
+            "json_data": pretty_json
+        }
+    )
     return JsonResponse(data)
+
+
+def home(request):
+    from django.shortcuts import render
+
+    """
+    Home page: Shows Connect / Logout depending on QuickBooks session.
+    """
+    qb_connected = all([
+        request.session.get('qb_access_token'),
+        request.session.get('qb_refresh_token'),
+        request.session.get('qb_realm_id'),
+        request.session.get('qb_token_expiry'),
+    ])
+
+    return render(request, 'index.html', {'qb_connected': qb_connected})
+
+
+from django.shortcuts import redirect, render
+
+
+def logout_view(request):
+    """
+    Logs out the user and clears QuickBooks tokens from session.
+    """
+    # Remove QuickBooks session data
+    keys_to_clear = [
+        'qb_access_token', 'qb_refresh_token', 'qb_realm_id', 'qb_token_expiry'
+    ]
+    for key in keys_to_clear:
+        if key in request.session:
+            del request.session[key]
+
+    # Optional: clear entire session
+    # request.session.flush()
+
+    return render(request, 'logout.html')

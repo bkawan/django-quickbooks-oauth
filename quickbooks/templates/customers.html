@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QuickBooks Customers</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #999;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    <a href="{% url 'home' %}">Home</a> | <a href="{% url 'invoices' %}">Invoices</a> | <a href="{% url 'company' %}">Company</a>
+
+</h1>
+<hr>
+<h1>QuickBooks Customers</h1>
+
+{% if error %}
+<p style="color:red">{{ error }}</p>
+{% else %}
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Display Name</th>
+        <th>Company Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Balance</th>
+        <th>Active</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for customer in customers %}
+    <tr>
+        <td><a href="{% url 'customer' customer.Id %}">{{customer.Id}}</a></td>
+        <td><a href="{% url 'customer' customer.Id %}">{{customer.DisplayName}}</a></td>
+        <td>{{ customer.CompanyName }}</td>
+        <td>{{ customer.PrimaryEmailAddr.Address|default:"N/A" }}</td>
+        <td>{{ customer.PrimaryPhone.FreeFormNumber|default:"N/A" }}</td>
+        <td>{{ customer.Balance }}</td>
+        <td>{{ customer.Active }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+</body>
+</html>

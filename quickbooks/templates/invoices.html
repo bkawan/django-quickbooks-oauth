@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QuickBooks Invoices</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #999;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<h1>
+    <a href="{% url 'home' %}">Home</a> |
+    <a href="{% url 'customers' %}">Customers</a> |
+    <a href="{% url 'company' %}">Company</a>
+</h1>
+<hr>
+
+<h1>QuickBooks Invoices</h1>
+
+{% if error %}
+<p style="color:red">{{ error }}</p>
+{% else %}
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>CustomerRef</th>
+        <th>DocNumber</th>
+        <th>TxnDate</th>
+        <th>TotalAmt</th>
+        <th>Balance</th>
+        <th>DueDate</th>
+        <th>PDF Download</th>
+        <th>View</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for inv in invoices %}
+    <tr>
+        <td>
+            <a href="{% url 'get_invoice' inv.Id %}">{{ inv.Id}}</a>
+        </td>
+
+        <td><a href="{% url 'customer' inv.CustomerRef.value %}">{{inv.CustomerRef.name}}
+            ( {{inv.CustomerRef.value}} )</a>
+        </td>
+
+
+        <td>
+            <a href="{% url 'get_invoice' inv.Id %}">{{ inv.DocNumber }}</a>
+        </td>
+
+        <td>{{ inv.TxnDate }}</td>
+
+        <td>{{ inv.TotalAmt|default:"0.00" }}</td>
+
+        <td>{{ inv.Balance|default:"0.00" }}</td>
+
+        <td>{{ inv.DueDate|default:"N/A" }}</td>
+
+
+        <td>
+            <a href="{% url 'invoice_pdf' inv.Id %}" target="_blank">PDF</a>
+        </td>
+
+        <td>
+            <a href="{% url 'get_invoice' inv.Id %}">View</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<h2>JSON Preview</h2>
+<pre style="background:#f0f0f0; padding:15px; border-radius:4px;">
+{{ json_data }}
+</pre>
+
+</body>
+</html>

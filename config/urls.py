@@ -21,7 +21,9 @@ from quickbooks import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('connect/', views.connect_to_quickbooks),
+    path('', views.home, name='home'),
+    path('logout/', views.logout_view, name='logout'),
+    path('connect/', views.connect_to_quickbooks, name='connect'),
     path('callback/', views.quickbooks_callback, name='qb_callback'),
     path('customers/', views.get_customers, name='customers'),
     path('customers/<int:id>/', views.get_customer, name='customer'),
@@ -30,4 +32,3 @@ urlpatterns = [
     path('invoices/<int:invoice_id>/pdf/', views.get_invoice_pdf, name='invoice_pdf'),
     path('invoices/<int:invoice_id>/', views.get_invoice, name='get_invoice'),
 ]
-

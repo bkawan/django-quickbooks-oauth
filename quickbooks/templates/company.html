@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Company JSON Preview</title>
+    <style>
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+            white-space: pre-wrap; /* wrap long lines */
+        }
+    </style>
+</head>
+<body>
+<h1>
+    <a href="{% url 'home' %}">Home</a> | <a href="{% url 'customers' %}"> Customer</a> | <a
+        href="{% url 'invoices' %}">Invoices</a>
+
+</h1>
+<hr>
+<h1>QuickBooks Company JSON Preview</h1>
+<pre>{{ json_data }}</pre>
+</body>
+</html>
