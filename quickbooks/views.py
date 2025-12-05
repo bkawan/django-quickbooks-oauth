@@ -115,7 +115,7 @@ def get_customers(request):
 
     base_url = settings.QBO_BASE_URL
     url = f"{base_url}/v3/company/{realm_id}/query"
-    query = "SELECT * FROM Customer MAXRESULTS 2"
+    query = "SELECT * FROM Customer MAXRESULTS 31"
 
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -227,7 +227,7 @@ def get_invoices(request):
     base_url = settings.QBO_BASE_URL
     url = f"{base_url}/v3/company/{realm_id}/query"
     params = {
-        "query": "SELECT * FROM Invoice  MAXRESULTS 5",
+        "query": "SELECT * FROM Invoice  MAXRESULTS 31",
         "minorversion": "75"  #
     }
     headers = {

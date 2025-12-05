@@ -2,6 +2,10 @@
 This Django project demonstrates **QuickBooks Online (QBO) OAuth 2.0 integration**, fetching company and customer data using **session-stored tokens**.
 It supports **sandbox and production environments** and automatically refreshes expired access tokens.
 
+## Demo Video
+![Demo GIF](assets/demo.gif)
+
+
 ## ASCII Diagram - OAuth & QuickBooks Integrations
 ```
 Step 1
