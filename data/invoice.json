@@ -1,0 +1,159 @@
+{
+  "QueryResponse": {
+    "Invoice": [
+      {
+        "AllowIPNPayment": false,
+        "AllowOnlinePayment": false,
+        "AllowOnlineCreditCardPayment": false,
+        "AllowOnlineACHPayment": false,
+        "domain": "QBO",
+        "sparse": false,
+        "Id": "149",
+        "SyncToken": "1",
+        "MetaData": {
+          "CreateTime": "2025-12-03T03:00:51-08:00",
+          "LastModifiedByRef": {
+            "value": "9341455797083067"
+          },
+          "LastUpdatedTime": "2025-12-03T03:08:09-08:00"
+        },
+        "CustomField": [],
+        "DocNumber": "1040",
+        "TxnDate": "2025-12-04",
+        "CurrencyRef": {
+          "value": "USD",
+          "name": "United States Dollar"
+        },
+        "LinkedTxn": [],
+        "Line": [
+          {
+            "Id": "1",
+            "LineNum": 1,
+            "Description": "Weekly Gardening Service",
+            "Amount": 10,
+            "DetailType": "SalesItemLineDetail",
+            "SalesItemLineDetail": {
+              "ItemRef": {
+                "value": "6",
+                "name": "Gardening"
+              },
+              "UnitPrice": 10,
+              "Qty": 1,
+              "ItemAccountRef": {
+                "value": "45",
+                "name": "Landscaping Services"
+              },
+              "TaxCodeRef": {
+                "value": "TAX"
+              }
+            },
+            "CustomExtensions": []
+          },
+          {
+            "Id": "2",
+            "LineNum": 2,
+            "Description": "Installation of landscape design",
+            "Amount": 50,
+            "DetailType": "SalesItemLineDetail",
+            "SalesItemLineDetail": {
+              "ItemRef": {
+                "value": "7",
+                "name": "Installation"
+              },
+              "UnitPrice": 50,
+              "Qty": 1,
+              "ItemAccountRef": {
+                "value": "52",
+                "name": "Landscaping Services:Labor:Installation"
+              },
+              "TaxCodeRef": {
+                "value": "NON"
+              }
+            },
+            "CustomExtensions": []
+          },
+          {
+            "Amount": 60,
+            "DetailType": "SubTotalLineDetail",
+            "SubTotalLineDetail": {
+
+            }
+          },
+          {
+            "Amount": 6,
+            "DetailType": "DiscountLineDetail",
+            "DiscountLineDetail": {
+              "PercentBased": true,
+              "DiscountPercent": 10,
+              "DiscountAccountRef": {
+                "value": "86",
+                "name": "Discounts given"
+              }
+            }
+          }
+        ],
+        "TxnTaxDetail": {
+          "TxnTaxCodeRef": {
+            "value": "2"
+          },
+          "TotalTax": 4.32,
+          "TaxLine": [
+            {
+              "Amount": 4.32,
+              "DetailType": "TaxLineDetail",
+              "TaxLineDetail": {
+                "TaxRateRef": {
+                  "value": "3"
+                },
+                "PercentBased": true,
+                "TaxPercent": 8,
+                "NetAmountTaxable": 54
+              }
+            }
+          ]
+        },
+        "CustomerRef": {
+          "value": "60",
+          "name": "john shrestha"
+        },
+        "CustomerMemo": {
+          "value": "Thank you for your business and have a great day!"
+        },
+        "BillAddr": {
+          "Id": "103",
+          "Line1": "john shrestha",
+          "Line2": "John & the company",
+          "Line3": "baneswor",
+          "Line4": "kathmandu, bagmati  44599",
+          "Line5": "nepal"
+        },
+        "ShipAddr": {
+          "Id": "98",
+          "Line1": "baneswor",
+          "City": "kathmandu",
+          "Country": "nepal",
+          "CountrySubDivisionCode": "bagmati",
+          "PostalCode": "44599"
+        },
+        "FreeFormAddress": false,
+        "SalesTermRef": {
+          "value": "4",
+          "name": "Net 60"
+        },
+        "DueDate": "2026-02-02",
+        "TotalAmt": 58.32,
+        "ApplyTaxAfterDiscount": true,
+        "PrintStatus": "NeedToPrint",
+        "EmailStatus": "NotSet",
+        "BillEmail": {
+          "Address": "ibikeshkawan@gmail.com"
+        },
+        "Balance": 58.32
+      }
+    ],
+    "startPosition": 1,
+    "maxResults": 1,
+    "totalCount": 1
+  },
+  "time": "2025-12-03T03:34:23.072-08:00"
+}
